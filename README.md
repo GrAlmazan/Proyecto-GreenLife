@@ -1,2 +1,2 @@
-# Proyecto-GreenLife
-Este es mi proyecto de titulacion de la Universidad De Matamoros, es un sistema en Arduino Mega para un invernadero automatizado casero.
+# Proyecto Green Life
+Green Life es un sistema automatizado para invernaderos caseros, diseñado para simplificar el cuidado de plantas al regular automáticamente variables clave como la temperatura, la humedad y la iluminación. Este proyecto está pensado para personas que deseen automatizar su huerto o invernadero sin necesidad de conocimientos avanzados de programación o electrónica.
