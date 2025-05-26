@@ -1,89 +1,82 @@
-#include "DHT.h"  // Liberia DHT
+#include "DHT.h"  // Librería DHT
 
-#define DHTPIN 28      //Pin del sensor DHT21 AM23O1
-#define DHTTYPE DHT21  //Defnimos el modelo del sensor DHT21 AM2301
+#define DHTPIN 28      // Pin del sensor DHT21 AM2301
+#define DHTTYPE DHT21  // Modelo del sensor DHT
 
 DHT dht(DHTPIN, DHTTYPE);
 
-//Variables de encendido (Salida)
-const int encendidoSensorHumedadYTemperatura = 52;
-const int encendidoSensorHumedad = 50;
-const int encendidoBombaDeAgua = 48;
-const int encendidoLucesUV = 42;
-const int encendidoVentilador = 38;
+// Pines de salida con nombres descriptivos
+const int abanicoIzquierdoPin = 2;
+const int abanicoDerechoPin = 3;
+const int bombaDeAguaPin = 4;
+const int ledRojoPin = 5;
+const int ledAzulPin = 6;
 
-//Variable de datos (Entrada)
-const int sensorPin = A15;
+// Pin de entrada para sensor de humedad del suelo
+const int sensorHumedadSueloPin = A15;
 
 void setup() {
-  Serial.begin(9600);                   // Se inicia la comunicación serial
-  Serial.println("Test DHT21 AM2301");  // Mensaje de inicialización
-  dht.begin();                          // Inicializamos el sensor DHT
+  Serial.begin(9600);
+  Serial.println("Test DHT21 AM2301");
+  dht.begin();
 
   // Configuración de pines
-  pinMode(sensorPin, INPUT);                            // Entrada de datos del sensor
-  pinMode(encendidoSensorHumedadYTemperatura, OUTPUT);  // Control del sensor de humedad y temperatura
-  pinMode(encendidoSensorHumedad, OUTPUT);              // Control del sensor de humedad
-  pinMode(encendidoBombaDeAgua, OUTPUT);                // Control de la bomba de agua
-  pinMode(encendidoLucesUV, OUTPUT);                    // Control de las luces UV
-  pinMode(encendidoVentilador, OUTPUT);                 // Control del ventilador
+  pinMode(sensorHumedadSueloPin, INPUT);
 
-  // Asegurarse de que todos estén apagados al inicio
-  digitalWrite(encendidoSensorHumedadYTemperatura, LOW);
-  digitalWrite(encendidoSensorHumedad, LOW);
-  digitalWrite(encendidoBombaDeAgua, LOW);
-  digitalWrite(encendidoLucesUV, LOW);
-  digitalWrite(encendidoVentilador, LOW);
+  pinMode(abanicoIzquierdoPin, OUTPUT);
+  pinMode(abanicoDerechoPin, OUTPUT);
+  pinMode(bombaDeAguaPin, OUTPUT);
+  pinMode(ledRojoPin, OUTPUT);
+  pinMode(ledAzulPin, OUTPUT);
+
+  // Asegurarse de que todo esté apagado al inicio
+  digitalWrite(abanicoIzquierdoPin, LOW);
+  digitalWrite(abanicoDerechoPin, LOW);
+  digitalWrite(bombaDeAguaPin, LOW);
+  digitalWrite(ledRojoPin, LOW);
+  digitalWrite(ledAzulPin, LOW);
 }
-
 
 void loop() {
   PruebasDeEncendido();
 
-
-  // Funcionamiento basico
   /*
   delay(3000);
   SensorDeHumedad();
   SensorDeTemperaturaYHumedad();
-  LucesUV();
+  EncenderLuces();
   delay(3000);
   */
 }
 
 void SensorDeHumedad() {
-  // Sensor de humedad en tierra
-  digitalWrite(encendidoSensorHumedad, HIGH);
-  int humedad = analogRead(sensorPin);  // Leer humedad del suelo
+  int humedad = analogRead(sensorHumedadSueloPin);
   Serial.print("Humedad del suelo: ");
   Serial.println(humedad);
 
   if (humedad < 500) {
-    Serial.println("Humedad baja - Realizando acción...");
-    BombaDeAgua();
-    delay(1000);
+    Serial.println("Humedad baja - Activando bomba de agua...");
+    EncenderBombaDeAgua();
   } else {
     Serial.println("Humedad adecuada.");
   }
-  digitalWrite(encendidoSensorHumedad, LOW);
 }
 
-void BombaDeAgua() {
-  //Encender Bomba por 3 segundos
-  digitalWrite(encendidoBombaDeAgua, HIGH);
-  delay(3000);
-  digitalWrite(encendidoBombaDeAgua, LOW);
-  delay(3000);
+// Funcion de BombaDeAgua
+void EncenderBombaDeAgua() {
+  digitalWrite(bombaDeAguaPin, HIGH);
+}
+
+void ApagarBombaDeAgua(){
+  digitalWrite(bombaDeAguaPin, LOW);
 }
 
 void SensorDeTemperaturaYHumedad() {
-  digitalWrite(encendidoSensorHumedadYTemperatura, HIGH);
-  // Sensor de temperatura y humedad
-  float h = dht.readHumidity();     // Leer humedad
-  float t = dht.readTemperature();  // Leer temperatura
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
 
   Serial.print("Humedad: ");
-  if (isnan(h)) {  // Validación de lectura
+  if (isnan(h)) {
     Serial.println("Error al leer la humedad");
   } else {
     Serial.print(h);
@@ -91,51 +84,59 @@ void SensorDeTemperaturaYHumedad() {
   }
 
   Serial.print("Temperatura: ");
-  if (isnan(t)) {  // Validación de lectura
+  if (isnan(t)) {
     Serial.println("Error al leer la temperatura");
   } else {
     Serial.print(t);
     Serial.println(" °C");
   }
-  digitalWrite(encendidoSensorHumedadYTemperatura, LOW);
 }
 
-void Ventiladores() {
-  //Encender Ventilador por 3 segundos
-  digitalWrite(encendidoVentilador, HIGH);
-  delay(3000);
-  digitalWrite(encendidoVentilador, LOW);
-  delay(3000);
+//Funciones de Ventiladores
+void EncenderVentiladores() {
+  digitalWrite(abanicoIzquierdoPin, HIGH);
+  digitalWrite(abanicoDerechoPin, HIGH);
 }
 
-void LucesUV() {
-  //Luces led por 3 segundos
-  digitalWrite(encendidoLucesUV, HIGH);
-  delay(5000);
-  digitalWrite(encendidoLucesUV, LOW);
-  delay(5000);
+void ApagarVentiladores(){
+  digitalWrite(abanicoIzquierdoPin, LOW);
+  digitalWrite(abanicoDerechoPin, LOW);
 }
 
-// Encender y apagar cada dispositivo durante 3 segundos
+//Funciones de Luces
+void EncenderLuces() {
+  digitalWrite(ledRojoPin, HIGH);
+  digitalWrite(ledAzulPin, HIGH);
+}
+
+void ApagarLuces(){
+  digitalWrite(ledRojoPin, LOW);
+  digitalWrite(ledAzulPin, LOW);
+}
+
 void PruebasDeEncendido() {
-  digitalWrite(encendidoLucesUV, HIGH);
+  digitalWrite(ledRojoPin, HIGH);
   delay(3000);
-  digitalWrite(encendidoLucesUV, LOW);
+  digitalWrite(ledRojoPin, LOW);
   delay(3000);
-  digitalWrite(encendidoVentilador, HIGH);
+
+  digitalWrite(ledAzulPin, HIGH);
   delay(3000);
-  digitalWrite(encendidoVentilador, LOW);
+  digitalWrite(ledAzulPin, LOW);
   delay(3000);
-  digitalWrite(encendidoSensorHumedadYTemperatura, HIGH);
+
+  digitalWrite(abanicoIzquierdoPin, HIGH);
   delay(3000);
-  digitalWrite(encendidoSensorHumedadYTemperatura, LOW);
+  digitalWrite(abanicoIzquierdoPin, LOW);
   delay(3000);
-  digitalWrite(encendidoSensorHumedad, HIGH);
+
+  digitalWrite(abanicoDerechoPin, HIGH);
   delay(3000);
-  digitalWrite(encendidoSensorHumedad, LOW);
+  digitalWrite(abanicoDerechoPin, LOW);
   delay(3000);
-  digitalWrite(encendidoBombaDeAgua, HIGH);
+
+  digitalWrite(bombaDeAguaPin, HIGH);
   delay(3000);
-  digitalWrite(encendidoBombaDeAgua, LOW);
+  digitalWrite(bombaDeAguaPin, LOW);
   delay(3000);
 }
