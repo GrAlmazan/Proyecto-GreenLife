@@ -1,0 +1,10 @@
+# ninja log v5
+41	1940	7701826986363411	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	88a701b14fa57722
+15	1955	7701826986413415	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	4497f439ac55e6da
+23	1959	7701826986403412	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	e65ac65824246e74
+1	2133	7701826988426165	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	e002476f82005577
+61	2147	7701826988576984	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	fda16f9cfd28de37
+51	2478	7701826991826751	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	3557b52fc331ba33
+32	2516	7701826992299758	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	c0db7be00bd4ce45
+8	2593	7701826992993844	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	b56170da040a7408
+2594	2702	7701826994219225	C:/Users/Cabon/OneDrive/Documentos/Unity/Green Life - App/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/2q6r6i4z/obj/arm64-v8a/libgame.so	1940036d77b1111a
