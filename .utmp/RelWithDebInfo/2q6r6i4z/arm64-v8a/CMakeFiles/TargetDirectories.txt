@@ -1,5 +1,0 @@
-C:/Users/Cabon/OneDrive/Documentos/Unity/Green Life - App/.utmp/RelWithDebInfo/2q6r6i4z/arm64-v8a/CMakeFiles/edit_cache.dir
-C:/Users/Cabon/OneDrive/Documentos/Unity/Green Life - App/.utmp/RelWithDebInfo/2q6r6i4z/arm64-v8a/CMakeFiles/rebuild_cache.dir
-C:/Users/Cabon/OneDrive/Documentos/Unity/Green Life - App/.utmp/RelWithDebInfo/2q6r6i4z/arm64-v8a/GameActivity/CMakeFiles/game.dir
-C:/Users/Cabon/OneDrive/Documentos/Unity/Green Life - App/.utmp/RelWithDebInfo/2q6r6i4z/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
-C:/Users/Cabon/OneDrive/Documentos/Unity/Green Life - App/.utmp/RelWithDebInfo/2q6r6i4z/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir

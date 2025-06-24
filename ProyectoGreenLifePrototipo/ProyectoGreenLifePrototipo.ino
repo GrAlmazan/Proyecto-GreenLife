@@ -1,189 +1,216 @@
-#include "DHT.h"  // Librería DHT
+#include <Wire.h>
+#include <DHT.h>
+#include <LiquidCrystal_I2C.h>
 
-#define DHTPIN1 11     // Primer sensor DHT21
-#define DHTPIN2 12     // Segundo sensor DHT21
-#define DHTTYPE DHT21  // Modelo del sensor DHT
+// Pantalla para sensores y tanque
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
+// Sensores DHT de Temperatura y Humedad
+#define DHTPIN1 11
+#define DHTPIN2 12
+#define DHTTYPE DHT21
 DHT dht1(DHTPIN1, DHTTYPE);
 DHT dht2(DHTPIN2, DHTTYPE);
 
-// Pines de salida con nombres descriptivos
+// Pines
+const int sensorHumedadSuelo1Pin = A0;
+const int sensorHumedadSuelo2Pin = A1;
+const int sensorNivelTanquePin = A2;
+
 const int abanicoIzquierdoPin = 2;
 const int abanicoDerechoPin = 3;
 const int bombaDeAguaPin = 4;
 const int ledRojoPin = 5;
 const int ledAzulPin = 6;
-const int releSensor1 = 7;
-const int releSensor2 = 8;
-const int releSensor3 = 9;
-const int releSensor4 = 10;
-
-// Pines de entrada para sensores de humedad del suelo
-const int sensorHumedadSuelo1Pin = A0;
-const int sensorHumedadSuelo2Pin = A1;
+const int sensorDeHumedad1 = 7; //
+const int sensorDeHumedad2 = 8; //
+const int sensorTemperatura = 9;
+const int sensorTemperatura2 = 10;
 
 void setup() {
   Serial.begin(9600);
-  Serial.println("Test DHT21 AM2301 x2");
   dht1.begin();
   dht2.begin();
 
-  // Configuración de pines
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("INICIANDO ...");
+  lcd.setCursor(0, 1);
+  lcd.print("GREEN LIFE");
+  delay(1000);
+  lcd.clear();
+
   pinMode(sensorHumedadSuelo1Pin, INPUT);
   pinMode(sensorHumedadSuelo2Pin, INPUT);
+  pinMode(sensorNivelTanquePin, INPUT);
 
   pinMode(abanicoIzquierdoPin, OUTPUT);
   pinMode(abanicoDerechoPin, OUTPUT);
   pinMode(bombaDeAguaPin, OUTPUT);
   pinMode(ledRojoPin, OUTPUT);
   pinMode(ledAzulPin, OUTPUT);
+  pinMode(sensorDeHumedad1, OUTPUT);
+  pinMode(sensorDeHumedad2, OUTPUT);
+  pinMode(sensorTemperatura, OUTPUT);
+  pinMode(sensorTemperatura2, OUTPUT);
 
-  pinMode(releSensor1, OUTPUT);
-  pinMode(releSensor2, OUTPUT);
-  pinMode(releSensor3, OUTPUT);
-  pinMode(releSensor4, OUTPUT);
 
-  // Asegurarse de que todo esté apagado al inicio
   digitalWrite(abanicoIzquierdoPin, LOW);
   digitalWrite(abanicoDerechoPin, LOW);
   digitalWrite(bombaDeAguaPin, LOW);
   digitalWrite(ledRojoPin, LOW);
   digitalWrite(ledAzulPin, LOW);
+  digitalWrite(sensorDeHumedad1, HIGH);
+  digitalWrite(sensorDeHumedad2, HIGH);
+  digitalWrite(sensorTemperatura, HIGH);
+  digitalWrite(sensorTemperatura2, HIGH);
 
-  digitalWrite(releSensor1, LOW);
-  digitalWrite(releSensor2, LOW);
-  digitalWrite(releSensor3, LOW);
-  digitalWrite(releSensor4, LOW);
+  Serial.println("Sistema iniciado");
+  Serial.println("Iniciando Void Loop");
 }
 
 void loop() {
-  PruebasDeEncendido();
-
-  /*
-  delay(3000);
-  SensorDeHumedad();
-  SensorDeTemperaturaYHumedad();
+  delay(5000);
+  MostrarSensorDeHumedadSuelo();
+  delay(2000);
+  MostrarNivelTanqueEnLCD();
+  delay(2000);
+  MostrarSensoresDHT();
+  delay(2000);
   EncenderLuces();
-  delay(3000);
-  */
+  EncenderVentiladores();
+  delay(10000);
 }
 
-void SensorDeHumedad() {
+// Humedad de suelo
+void MostrarSensorDeHumedadSuelo() {
   int humedad1 = analogRead(sensorHumedadSuelo1Pin);
   int humedad2 = analogRead(sensorHumedadSuelo2Pin);
 
-  Serial.print("Humedad del suelo 1: ");
-  Serial.println(humedad1);
-  Serial.print("Humedad del suelo 2: ");
-  Serial.println(humedad2);
+  // Mostrar en la pantalla LCD
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("H.T1:");
+  lcd.print(humedad1);
+  lcd.print("H.T2:");
+  lcd.print(humedad2);
 
+  lcd.setCursor(0, 1);
   if (humedad1 < 500 || humedad2 < 500) {
-    Serial.println("Humedad baja - Activando bomba de agua...");
-    EncenderBombaDeAgua();
-  } else {
-    Serial.println("Humedad adecuada.");
+    lcd.print("Riego Activado");
+    Serial.println("Humedad baja: activando bomba...");
+    // EncenderBombaDeAgua();
+    delay(12000);
     ApagarBombaDeAgua();
+  } else {
+    lcd.print("Humedad OK");
+    Serial.println("Humedad adecuada.");
+    // ApagarBombaDeAgua();
   }
 }
 
-// Función de BombaDeAgua
-void EncenderBombaDeAgua() {
-  digitalWrite(bombaDeAguaPin, HIGH);
+// Mostrar nivel de tanque en pantalla 0x27
+void MostrarNivelTanqueEnLCD() {
+  int valor = analogRead(sensorNivelTanquePin);
+  lcd.clear();
+  delay(100);
+
+  lcd.setCursor(0, 0);
+  lcd.print("Tanque: ");
+  lcd.print(valor);
+
+  lcd.setCursor(0, 1);
+  lcd.print("Nivel: ");
+  if (valor == 0) {
+    lcd.print("Bajo ");
+  } else if (valor > 1 && valor < 350) {
+    lcd.print("Bajo  ");
+  } else if (valor >= 350 && valor < 510) {
+    lcd.print("Medio ");
+  } else if (valor >= 510) {
+    lcd.print("Alto  ");
+  }
+
+  Serial.print("Nivel tanque: ");
+  Serial.println(valor);
 }
 
-void ApagarBombaDeAgua(){
-  digitalWrite(bombaDeAguaPin, LOW);
-}
-
-void SensorDeTemperaturaYHumedad() {
+// Mostrar sensores DHT en pantalla 0x27
+void MostrarSensoresDHT() {
   float h1 = dht1.readHumidity();
   float t1 = dht1.readTemperature();
 
   float h2 = dht2.readHumidity();
   float t2 = dht2.readTemperature();
 
-  Serial.println("Sensor DHT1:");
-  Serial.print("Humedad: ");
-  Serial.print(h1);
-  Serial.println(" %");
-  Serial.print("Temperatura: ");
-  Serial.print(t1);
-  Serial.println(" °C");
+  lcd.clear();
+  delay(100);
 
-  Serial.println("Sensor DHT2:");
-  Serial.print("Humedad: ");
-  Serial.print(h2);
-  Serial.println(" %");
-  Serial.print("Temperatura: ");
-  Serial.print(t2);
-  Serial.println(" °C");
+  lcd.setCursor(0, 0);
+  lcd.print("T1:");
+  lcd.print(t1, 1);
+  lcd.print(" H1:");
+  lcd.print(h1, 0);
+
+  lcd.setCursor(0, 1);
+  lcd.print("T2:");
+  lcd.print(t2, 1);
+  lcd.print(" H2:");
+  lcd.print(h2, 0);
+
+  Serial.print("T1: "); Serial.print(t1); Serial.print(" H1: "); Serial.println(h1);
+  Serial.print("T2: "); Serial.print(t2); Serial.print(" H2: "); Serial.println(h2);
 }
 
-//Funciones de Ventiladores
+void MostrarHumedadSueloEnLCD() {
+  int humedad1 = analogRead(sensorHumedadSuelo1Pin);
+  int humedad2 = analogRead(sensorHumedadSuelo2Pin);
+
+  lcd.clear();
+  delay(100);
+
+  lcd.setCursor(0, 0);
+  lcd.print("Humedad 1: ");
+  lcd.print(humedad1);
+
+  lcd.setCursor(0, 1);
+  lcd.print("Humedad 2: ");
+  lcd.print(humedad2);
+
+  Serial.print("Humedad Suelo 1: ");
+  Serial.println(humedad1);
+  Serial.print("Humedad Suelo 2: ");
+  Serial.println(humedad2);
+}
+
+// Bomba
+void EncenderBombaDeAgua() {
+  digitalWrite(bombaDeAguaPin, HIGH);
+}
+
+void ApagarBombaDeAgua() {
+  digitalWrite(bombaDeAguaPin, LOW);
+}
+
+// Ventiladores
 void EncenderVentiladores() {
   digitalWrite(abanicoIzquierdoPin, HIGH);
   digitalWrite(abanicoDerechoPin, HIGH);
 }
 
-void ApagarVentiladores(){
+void ApagarVentiladores() {
   digitalWrite(abanicoIzquierdoPin, LOW);
   digitalWrite(abanicoDerechoPin, LOW);
 }
 
-//Funciones de Luces
+// Luces
 void EncenderLuces() {
   digitalWrite(ledRojoPin, HIGH);
   digitalWrite(ledAzulPin, HIGH);
 }
 
-void ApagarLuces(){
+void ApagarLuces() {
   digitalWrite(ledRojoPin, LOW);
   digitalWrite(ledAzulPin, LOW);
-}
-
-void PruebasDeEncendido() {
-  digitalWrite(ledRojoPin, HIGH);
-  delay(3000);
-  digitalWrite(ledRojoPin, LOW);
-  delay(3000);
-
-  digitalWrite(ledAzulPin, HIGH);
-  delay(3000);
-  digitalWrite(ledAzulPin, LOW);
-  delay(3000);
-
-  digitalWrite(abanicoIzquierdoPin, HIGH);
-  delay(3000);
-  digitalWrite(abanicoIzquierdoPin, LOW);
-  delay(3000);
-
-  digitalWrite(abanicoDerechoPin, HIGH);
-  delay(3000);
-  digitalWrite(abanicoDerechoPin, LOW);
-  delay(3000);
-
-  digitalWrite(bombaDeAguaPin, HIGH);
-  delay(3000);
-  digitalWrite(bombaDeAguaPin, LOW);
-  delay(3000);
-
-  digitalWrite(releSensor1, HIGH);
-  delay(3000);
-  digitalWrite(releSensor1, LOW);
-  delay(3000);
-
-  digitalWrite(releSensor2, HIGH);
-  delay(3000);
-  digitalWrite(releSensor2, LOW);
-  delay(3000);
-
-  digitalWrite(releSensor3, HIGH);
-  delay(3000);
-  digitalWrite(releSensor3, LOW);
-  delay(3000);
-
-  digitalWrite(releSensor4, HIGH);
-  delay(3000);
-  digitalWrite(releSensor4, LOW);
-  delay(3000);
 }
