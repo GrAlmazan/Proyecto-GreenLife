@@ -71,17 +71,15 @@ void setup() {
 }
 
 void loop() {
+  MostrarNivelTanqueEnLCD();
+  delay(5000);
+  MostrarSensoresDHT();
   delay(5000);
   MostrarSensorDeHumedadSuelo();
-  delay(2000);
-  MostrarNivelTanqueEnLCD();
-  delay(2000);
-  MostrarSensoresDHT();
-  delay(2000);
+  delay(5000);
   EncenderLuces();
   EncenderVentiladores();
-  delay(10000);
-}
+  delay(5000);
 
 // Humedad de suelo
 void MostrarSensorDeHumedadSuelo() {
@@ -100,8 +98,8 @@ void MostrarSensorDeHumedadSuelo() {
   if (humedad1 < 500 || humedad2 < 500) {
     lcd.print("Riego Activado");
     Serial.println("Humedad baja: activando bomba...");
-    // EncenderBombaDeAgua();
-    delay(12000);
+    EncenderBombaDeAgua();
+    delay(23000); // 500 mililitros 80litrosX1hora
     ApagarBombaDeAgua();
   } else {
     lcd.print("Humedad OK");
