@@ -80,6 +80,7 @@ void loop() {
   EncenderLuces();
   EncenderVentiladores();
   delay(5000);
+}
 
 // Humedad de suelo
 void MostrarSensorDeHumedadSuelo() {
