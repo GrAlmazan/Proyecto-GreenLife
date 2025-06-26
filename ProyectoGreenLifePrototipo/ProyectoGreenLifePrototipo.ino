@@ -1,3 +1,4 @@
+//Librerias necesarias
 #include <Wire.h>
 #include <DHT.h>
 #include <LiquidCrystal_I2C.h>
@@ -6,13 +7,13 @@
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // Sensores DHT de Temperatura y Humedad
-#define DHTPIN1 11
-#define DHTPIN2 12
+#define DHTPIN1 12
+#define DHTPIN2 13
 #define DHTTYPE DHT21
 DHT dht1(DHTPIN1, DHTTYPE);
 DHT dht2(DHTPIN2, DHTTYPE);
 
-// Pines
+// Pines del arduino
 const int sensorHumedadSuelo1Pin = A0;
 const int sensorHumedadSuelo2Pin = A1;
 const int sensorNivelTanquePin = A2;
@@ -38,7 +39,7 @@ void setup() {
   lcd.print("INICIANDO ...");
   lcd.setCursor(0, 1);
   lcd.print("GREEN LIFE");
-  delay(1000);
+  delay(2000);
   lcd.clear();
 
   pinMode(sensorHumedadSuelo1Pin, INPUT);
@@ -61,10 +62,10 @@ void setup() {
   digitalWrite(bombaDeAguaPin, LOW);
   digitalWrite(ledRojoPin, LOW);
   digitalWrite(ledAzulPin, LOW);
-  digitalWrite(sensorDeHumedad1, HIGH);
-  digitalWrite(sensorDeHumedad2, HIGH);
-  digitalWrite(sensorTemperatura, HIGH);
-  digitalWrite(sensorTemperatura2, HIGH);
+  digitalWrite(sensorDeHumedad1, LOW);
+  digitalWrite(sensorDeHumedad2, LOW);
+  digitalWrite(sensorTemperatura, LOW);
+  digitalWrite(sensorTemperatura2, LOW);
 
   Serial.println("Sistema iniciado");
   Serial.println("Iniciando Void Loop");
@@ -72,18 +73,23 @@ void setup() {
 
 void loop() {
   MostrarNivelTanqueEnLCD();
-  delay(5000);
+  delay(6000);
+
   MostrarSensoresDHT();
-  delay(5000);
+  delay(6000);
+
   MostrarSensorDeHumedadSuelo();
-  delay(5000);
-  EncenderLuces();
-  EncenderVentiladores();
-  delay(5000);
+  delay(6000);
+
+  ControlarClima();
+  delay(6000);
 }
 
 // Humedad de suelo
 void MostrarSensorDeHumedadSuelo() {
+  //Encender Sensores
+  EncenderSensoresSuelo();
+
   int humedad1 = analogRead(sensorHumedadSuelo1Pin);
   int humedad2 = analogRead(sensorHumedadSuelo2Pin);
 
@@ -99,14 +105,16 @@ void MostrarSensorDeHumedadSuelo() {
   if (humedad1 < 500 || humedad2 < 500) {
     lcd.print("Riego Activado");
     Serial.println("Humedad baja: activando bomba...");
-    EncenderBombaDeAgua();
-    delay(23000); // 500 mililitros 80litrosX1hora
+    //EncenderBombaDeAgua();
+    //delay(23000); // 500 mililitros 80litrosX1hora
     ApagarBombaDeAgua();
   } else {
     lcd.print("Humedad OK");
     Serial.println("Humedad adecuada.");
-    // ApagarBombaDeAgua();
+    ApagarBombaDeAgua();
   }
+  // Apagar sensores 
+  ApagarSensoresSuelo();
 }
 
 // Mostrar nivel de tanque en pantalla 0x27
@@ -137,6 +145,8 @@ void MostrarNivelTanqueEnLCD() {
 
 // Mostrar sensores DHT en pantalla 0x27
 void MostrarSensoresDHT() {
+  EncenderSensoresDHT();
+
   float h1 = dht1.readHumidity();
   float t1 = dht1.readTemperature();
 
@@ -160,29 +170,90 @@ void MostrarSensoresDHT() {
 
   Serial.print("T1: "); Serial.print(t1); Serial.print(" H1: "); Serial.println(h1);
   Serial.print("T2: "); Serial.print(t2); Serial.print(" H2: "); Serial.println(h2);
+  
+  ApagarSensoresDHT();
 }
 
-void MostrarHumedadSueloEnLCD() {
-  int humedad1 = analogRead(sensorHumedadSuelo1Pin);
-  int humedad2 = analogRead(sensorHumedadSuelo2Pin);
+void ControlarClima() {
+  EncenderSensoresDHT(); // Encender sensores de temperatura/humedad
+
+  float t1 = dht1.readTemperature();
+  float t2 = dht2.readTemperature();
+  float promedioTemp = (t1 + t2) / 2.0;
+
+  Serial.print("Temperatura promedio: ");
+  Serial.println(promedioTemp);
 
   lcd.clear();
-  delay(100);
-
   lcd.setCursor(0, 0);
-  lcd.print("Humedad 1: ");
-  lcd.print(humedad1);
-
+  lcd.print("Temp. Promedio:");
   lcd.setCursor(0, 1);
-  lcd.print("Humedad 2: ");
-  lcd.print(humedad2);
+  lcd.print(promedioTemp);
+  delay(3000);
 
-  Serial.print("Humedad Suelo 1: ");
-  Serial.println(humedad1);
-  Serial.print("Humedad Suelo 2: ");
-  Serial.println(humedad2);
+  // Condición: temperatura baja (simula noche)
+  if (promedioTemp < 22.0) {
+    Serial.println("Temp baja - Activando luces UV, apagando ventiladores.");
+
+    EncenderLuces();
+    ApagarVentiladores();
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("ENCENDIENDO");
+    lcd.setCursor(0, 1);
+    lcd.print("LUZ UV");
+    delay(1000);
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("APAGANDO");
+    lcd.setCursor(0, 1);
+    lcd.print("VENTILADORES");
+    delay(1000);
+  }
+
+  // Condición: temperatura alta
+  else if (promedioTemp > 28.0) {
+    Serial.println("Temp alta - Activando ventiladores, apagando luces UV.");
+
+    ApagarLuces();
+    EncenderVentiladores();
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("ENCENDIENDO");
+    lcd.setCursor(0, 1);
+    lcd.print("VENTILADORES");
+    delay(1000);
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("APAGANDO");
+    lcd.setCursor(0, 1);
+    lcd.print("LUZ UV");
+    delay(1000);
+  }
+
+  // Condición: temperatura normal
+  else {
+    Serial.println("Temp normal - Apagando luces UV y ventiladores.");
+
+    ApagarLuces();
+    ApagarVentiladores();
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("TEMP. ESTABLE");
+    lcd.setCursor(0, 1);
+    lcd.print("TODO EN OFF");
+    delay(1000);
+  }
+
+  ApagarSensoresDHT(); // Apagar sensores al terminar
 }
 
+// ! Funciones de Encendido y Apagado ------------------------
 // Bomba
 void EncenderBombaDeAgua() {
   digitalWrite(bombaDeAguaPin, HIGH);
@@ -212,4 +283,26 @@ void EncenderLuces() {
 void ApagarLuces() {
   digitalWrite(ledRojoPin, LOW);
   digitalWrite(ledAzulPin, LOW);
+}
+
+// Sensores de Suelo
+void EncenderSensoresSuelo(){
+  digitalWrite(sensorDeHumedad1, HIGH);
+  digitalWrite(sensorDeHumedad2, HIGH);
+}
+
+void ApagarSensoresSuelo(){
+  digitalWrite(sensorDeHumedad1, LOW);
+  digitalWrite(sensorDeHumedad2, LOW);
+}
+
+// Sensores de Ambiente
+void EncenderSensoresDHT(){
+  digitalWrite(sensorTemperatura, HIGH);
+  digitalWrite(sensorTemperatura2, HIGH);
+}
+
+void ApagarSensoresDHT(){
+  digitalWrite(sensorTemperatura, LOW);
+  digitalWrite(sensorTemperatura2, LOW);
 }
