@@ -77,6 +77,10 @@ void loop() {
   */
   MostrarSensoresDHT();
   delay(6000);
+
+  MostrarSensorDeHumedadSuelo();
+  delay(6000);
+
   /*
   MostrarSensorDeHumedadSuelo();
   delay(6000);
