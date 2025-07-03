@@ -7,8 +7,8 @@
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // Sensores DHT de Temperatura y Humedad
-#define DHTPIN1 12
-#define DHTPIN2 13
+#define DHTPIN1 23
+#define DHTPIN2 25
 #define DHTTYPE DHT21
 DHT dht1(DHTPIN1, DHTTYPE);
 DHT dht2(DHTPIN2, DHTTYPE);
@@ -23,10 +23,10 @@ const int abanicoDerechoPin = 3;
 const int bombaDeAguaPin = 4;
 const int ledRojoPin = 5;
 const int ledAzulPin = 6;
-const int sensorDeHumedad1 = 7; //
-const int sensorDeHumedad2 = 8; //
-const int sensorTemperatura = 9;
-const int sensorTemperatura2 = 10;
+const int sensorDht1 = 7;
+const int sensorDht2 = 8;
+const int sensorDeSueloIzquierdo = 9;
+const int sensorDeSueloDerecho = 10;
 
 void setup() {
   Serial.begin(9600);
@@ -51,38 +51,39 @@ void setup() {
   pinMode(bombaDeAguaPin, OUTPUT);
   pinMode(ledRojoPin, OUTPUT);
   pinMode(ledAzulPin, OUTPUT);
-  pinMode(sensorDeHumedad1, OUTPUT);
-  pinMode(sensorDeHumedad2, OUTPUT);
-  pinMode(sensorTemperatura, OUTPUT);
-  pinMode(sensorTemperatura2, OUTPUT);
-
+  pinMode(sensorDht1, OUTPUT);
+  pinMode(sensorDht2, OUTPUT);
+  pinMode(sensorDeSueloIzquierdo, OUTPUT);
+  pinMode(sensorDeSueloDerecho, OUTPUT);
 
   digitalWrite(abanicoIzquierdoPin, LOW);
   digitalWrite(abanicoDerechoPin, LOW);
   digitalWrite(bombaDeAguaPin, LOW);
   digitalWrite(ledRojoPin, LOW);
   digitalWrite(ledAzulPin, LOW);
-  digitalWrite(sensorDeHumedad1, LOW);
-  digitalWrite(sensorDeHumedad2, LOW);
-  digitalWrite(sensorTemperatura, LOW);
-  digitalWrite(sensorTemperatura2, LOW);
+  digitalWrite(sensorDht1, HIGH); //Sensores dht
+  digitalWrite(sensorDht2, HIGH); // Sensores dht
+  digitalWrite(sensorDeSueloIzquierdo, LOW); // Sensor de tierra IZQUIERDO
+  digitalWrite(sensorDeSueloDerecho, LOW); // Sensor de tierra Derecho
 
   Serial.println("Sistema iniciado");
   Serial.println("Iniciando Void Loop");
 }
 
 void loop() {
+  /*
   MostrarNivelTanqueEnLCD();
   delay(6000);
-
+  */
   MostrarSensoresDHT();
   delay(6000);
-
+  /*
   MostrarSensorDeHumedadSuelo();
   delay(6000);
 
   ControlarClima();
   delay(6000);
+  */
 }
 
 // Humedad de suelo
@@ -145,7 +146,7 @@ void MostrarNivelTanqueEnLCD() {
 
 // Mostrar sensores DHT en pantalla 0x27
 void MostrarSensoresDHT() {
-  EncenderSensoresDHT();
+  //EncenderSensoresDHT();
 
   float h1 = dht1.readHumidity();
   float t1 = dht1.readTemperature();
@@ -171,7 +172,8 @@ void MostrarSensoresDHT() {
   Serial.print("T1: "); Serial.print(t1); Serial.print(" H1: "); Serial.println(h1);
   Serial.print("T2: "); Serial.print(t2); Serial.print(" H2: "); Serial.println(h2);
   
-  ApagarSensoresDHT();
+  delay(2000);
+  //ApagarSensoresDHT();
 }
 
 void ControlarClima() {
@@ -191,7 +193,6 @@ void ControlarClima() {
   lcd.print(promedioTemp);
   delay(3000);
 
-  // Condición: temperatura baja (simula noche)
   if (promedioTemp < 22.0) {
     Serial.println("Temp baja - Activando luces UV, apagando ventiladores.");
 
@@ -211,10 +212,7 @@ void ControlarClima() {
     lcd.setCursor(0, 1);
     lcd.print("VENTILADORES");
     delay(1000);
-  }
-
-  // Condición: temperatura alta
-  else if (promedioTemp > 28.0) {
+  } else if (promedioTemp > 28.0) {
     Serial.println("Temp alta - Activando ventiladores, apagando luces UV.");
 
     ApagarLuces();
@@ -233,10 +231,7 @@ void ControlarClima() {
     lcd.setCursor(0, 1);
     lcd.print("LUZ UV");
     delay(1000);
-  }
-
-  // Condición: temperatura normal
-  else {
+  } else {
     Serial.println("Temp normal - Apagando luces UV y ventiladores.");
 
     ApagarLuces();
@@ -287,22 +282,22 @@ void ApagarLuces() {
 
 // Sensores de Suelo
 void EncenderSensoresSuelo(){
-  digitalWrite(sensorDeHumedad1, HIGH);
-  digitalWrite(sensorDeHumedad2, HIGH);
+  digitalWrite(sensorDeSueloIzquierdo, HIGH);
+  digitalWrite(sensorDeSueloDerecho, HIGH);
 }
 
 void ApagarSensoresSuelo(){
-  digitalWrite(sensorDeHumedad1, LOW);
-  digitalWrite(sensorDeHumedad2, LOW);
+  digitalWrite(sensorDeSueloIzquierdo, LOW);
+  digitalWrite(sensorDeSueloDerecho, LOW);
 }
 
 // Sensores de Ambiente
 void EncenderSensoresDHT(){
-  digitalWrite(sensorTemperatura, HIGH);
-  digitalWrite(sensorTemperatura2, HIGH);
+  digitalWrite(sensorDht1, HIGH);
+  digitalWrite(sensorDht2, HIGH);
 }
 
 void ApagarSensoresDHT(){
-  digitalWrite(sensorTemperatura, LOW);
-  digitalWrite(sensorTemperatura2, LOW);
+  digitalWrite(sensorDht1, LOW);
+  digitalWrite(sensorDht2, LOW);
 }
