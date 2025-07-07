@@ -7,8 +7,8 @@
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // Sensores DHT de Temperatura y Humedad
-#define DHTPIN1 23
-#define DHTPIN2 25
+#define DHTPIN1 29
+#define DHTPIN2 26
 #define DHTTYPE DHT21
 DHT dht1(DHTPIN1, DHTTYPE);
 DHT dht2(DHTPIN2, DHTTYPE);
@@ -68,13 +68,20 @@ void setup() {
 
   Serial.println("Sistema iniciado");
   Serial.println("Iniciando Void Loop");
+  //Borrar esto
+  EncenderLuces();
+  EncenderVentiladores();
+
 }
 
 void loop() {
   /*
+  EncenderLuces();
+  */
+
   MostrarNivelTanqueEnLCD();
   delay(6000);
-  */
+
   MostrarSensoresDHT();
   delay(6000);
 
@@ -82,9 +89,6 @@ void loop() {
   delay(6000);
 
   /*
-  MostrarSensorDeHumedadSuelo();
-  delay(6000);
-
   ControlarClima();
   delay(6000);
   */
@@ -101,10 +105,10 @@ void MostrarSensorDeHumedadSuelo() {
   // Mostrar en la pantalla LCD
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("H.T1:");
-  lcd.print(humedad1);
-  lcd.print("H.T2:");
-  lcd.print(humedad2);
+  lcd.print("HT1:");
+  lcd.print(humedad1); // A0
+  lcd.print("HT2:");
+  lcd.print(humedad2); // A1
 
   lcd.setCursor(0, 1);
   if (humedad1 < 500 || humedad2 < 500) {
@@ -119,6 +123,7 @@ void MostrarSensorDeHumedadSuelo() {
     ApagarBombaDeAgua();
   }
   // Apagar sensores 
+  delay(2000);
   ApagarSensoresSuelo();
 }
 
