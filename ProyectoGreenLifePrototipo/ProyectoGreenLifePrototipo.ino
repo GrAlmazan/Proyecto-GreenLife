@@ -28,7 +28,7 @@ const int sensorDht2 = 8;
 const int sensorDeSueloIzquierdo = 9;
 const int sensorDeSueloDerecho = 10;
 
-bool unaVez = false;
+bool sensorSueloMostrado = false;
 
 void setup() {
   Serial.begin(9600);
@@ -62,7 +62,7 @@ void setup() {
   digitalWrite(abanicoDerechoPin, LOW);
   digitalWrite(bombaDeAguaPin, LOW);
   digitalWrite(ledRojoPin, LOW);
-  digitalWrite(ledAzulPin, LOW);
+  digitalWrite(ledAzulPin, LOW); 
   digitalWrite(sensorDht1, LOW); //Sensores dht
   digitalWrite(sensorDht2, LOW); // Sensores dht
 /*
@@ -80,16 +80,17 @@ void setup() {
 }
 
 void loop() {
-  /*
-  EncenderLuces();
-  */
-
-  if(!unaVez){
+  
+  if (!sensorSueloMostrado) {
     MostrarSensorDeHumedadSuelo();
-    delay(6000);
-    unaVez = true;
+    sensorSueloMostrado = true;  // Solo se ejecuta una vez
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.init();  // Inicializa la pantalla (en LiquidCrystal_I2C)
+    lcd.backlight(); // Enciende la luz de fondo (si aplica)
+    delay(1000);
   }
-
+  
   MostrarNivelTanqueEnLCD();
   delay(6000);
 
@@ -98,16 +99,11 @@ void loop() {
 
   MostrarSensorDeHumedadSueloBuena();
   delay(6000);
-
-  /*
-  ControlarClima();
-  delay(6000);
-  */
 }
 
 // Humedad de suelo
 void MostrarSensorDeHumedadSuelo() {
-  //Encender Sensores
+  // Encender Sensores
   EncenderSensoresSuelo();
 
   int humedad1 = analogRead(sensorHumedadSuelo1Pin);
@@ -118,25 +114,20 @@ void MostrarSensorDeHumedadSuelo() {
   lcd.setCursor(0, 0);
   lcd.print("HT1:");
   lcd.print(humedad1); // A0
-  lcd.print("HT2:");
+  lcd.print(" HT2:");
   lcd.print(humedad2); // A1
 
-  lcd.setCursor(0, 1);
   if (humedad1 < 500 || humedad2 < 500) {
-    lcd.print("Riego Activado");
+    lcd.setCursor(0, 1);
+    lcd.print("Riego Activado ");
     Serial.println("Humedad baja: activando bomba...");
+    delay(1000);
     EncenderBombaDeAgua();
     delay(23000);
     ApagarBombaDeAgua();
-  } else {
-    lcd.print("Humedad OK");
-    Serial.println("Humedad adecuada.");
-    ApagarBombaDeAgua();
   }
-  // Apagar sensores 
-  delay(2000);
-  ApagarSensoresSuelo();
 }
+
 
 // Humedad de suelo
 void MostrarSensorDeHumedadSueloBuena() {
@@ -151,11 +142,10 @@ void MostrarSensorDeHumedadSueloBuena() {
   lcd.setCursor(0, 0);
   lcd.print("HT1:");
   lcd.print(humedad1); // A0
-  lcd.print("HT2:");
+  lcd.print(" HT2:");
   lcd.print(humedad2); // A1
-
   lcd.setCursor(0, 1);
-  Serial.println("Humedad adecuada.");
+  lcd.print("Humedad adecuada.");
   // Apagar sensores 
   delay(2000);
   ApagarSensoresSuelo();
