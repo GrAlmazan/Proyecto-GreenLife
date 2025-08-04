@@ -74,9 +74,6 @@ void setup() {
 
   Serial.println("Sistema iniciado");
   Serial.println("Iniciando Void Loop");
-  //Borrar esto
-  EncenderLuces();
-  EncenderVentiladores();
 }
 
 void loop() {
