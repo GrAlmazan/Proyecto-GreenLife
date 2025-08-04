@@ -65,10 +65,6 @@ void setup() {
   digitalWrite(ledAzulPin, LOW); 
   digitalWrite(sensorDht1, LOW); //Sensores dht
   digitalWrite(sensorDht2, LOW); // Sensores dht
-/*
-  digitalWrite(sensorDht1, HIGH); //Sensores dht
-  digitalWrite(sensorDht2, HIGH); // Sensores dht
-*/
   digitalWrite(sensorDeSueloIzquierdo, LOW); // Sensor de tierra IZQUIERDO
   digitalWrite(sensorDeSueloDerecho, LOW); // Sensor de tierra Derecho
 
