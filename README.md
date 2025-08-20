@@ -1,9 +1,8 @@
 # 🌱 Sistema Automatizado para Invernaderos
 
 Este proyecto presenta un **sistema automatizado para invernaderos**, desarrollado con el objetivo de optimizar el cuidado y crecimiento de las plantas mediante el uso de tecnologías inteligentes.  
-
-![Vista del sistema](https://i.imgur.com/ejemplo.png](https://img.notionusercontent.com/s3/prod-files-secure%2F71d1d432-d802-447b-9484-a585096a40cc%2F5f7eccae-3f4c-47b1-a866-8fb0f5ae5d3a%2F0c794197-3dd9-472f-9f2f-af05d9cc311c.jpeg/size/w=670?exp=1755814472&sig=qOs-FwJ9F6qaiFiKqV0cwNiLsw5syDCu6o5ZcOJ2rlw&id=1bad7ac5-efdb-80a1-a300-e586beab570a&table=block))
-
+![Vista del sistema](./assets/img/foto.jpg)
+![Vista del sistema](./assets/img/foto1.jpg)
 
 ## 🚀 Características principales
 - **Monitoreo en tiempo real**: Uso de sensores de humedad y temperatura para registrar el estado del ambiente.  
