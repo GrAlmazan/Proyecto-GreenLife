@@ -22,4 +22,5 @@ Garantizar las condiciones óptimas para el crecimiento de diferentes tipos de p
 Puedes consultar la documentación completa del proyecto, así como más detalles técnicos y avances en el siguiente enlace:
 
 🔗 [Ver documentación en Notion](https://innovative-cave-016.notion.site/Proyecto-Green-Life-60ea8b23e7c040eaa971645b0d738cc6)
+<br>
 ![Vista del sistema](./assets/img/qr.png)
