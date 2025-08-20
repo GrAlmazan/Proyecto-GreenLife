@@ -16,3 +16,10 @@ Si se utiliza otro modelo de Arduino (como el Uno o Nano), es posible que no se 
 
 ## 🎯 Objetivo
 Garantizar las condiciones óptimas para el crecimiento de diferentes tipos de plantas, reduciendo el esfuerzo manual y aumentando la eficiencia en la producción dentro del invernadero.  
+
+## 🌐 Página web y documentación
+
+Puedes consultar la documentación completa del proyecto, así como más detalles técnicos y avances en el siguiente enlace:
+
+🔗 [Ver documentación en Notion](https://innovative-cave-016.notion.site/Proyecto-Green-Life-60ea8b23e7c040eaa971645b0d738cc6)
+![Vista del sistema](./assets/img/qr.png)
